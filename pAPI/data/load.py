@@ -6,7 +6,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from dbsetup import *
 from config import asset_ids
-from time import sleep
 
 engine = create_engine('sqlite:///data/papi.db')
 node = pa.RpcNode(testnet=True)
@@ -118,9 +117,4 @@ def loadCards(s, Deck):
             s.rollback()
             continue
 
-while True:
-    try:
-        loadData(deck_ids=asset_ids)
-        sleep(120)
-    except KeyboardInterrupt:
-        break
+loadData(deck_ids=asset_ids)

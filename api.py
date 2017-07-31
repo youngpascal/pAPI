@@ -28,7 +28,7 @@ def productionAssets():
 def _productionCards():
     Session = sessionmaker(bind=engine)
     s = Session()
-    condition = ("select d.name AS [Deck Name], c.blockheight AS [Card Blockheight], c.blockseq AS [Card Blocksequence], "
+    condition = ("select d.name AS [Deck Name], c.blocknum AS [Card Blockheight], c.blockseq AS [Card Blocksequence], "
                 "c.cardseq AS [Card Sequence], c.sender AS [Sender], c.Receiver AS [Receiver], c.amount AS [Card Amount], " 
                 "c.id AS [Card TxiD]"
                 "from decks d inner join cards c on c.decks_id = d.txid "

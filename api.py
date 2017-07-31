@@ -32,7 +32,7 @@ def _productionCards():
                 "c.cardseq AS [Card Sequence], c.sender AS [Sender], c.Receiver AS [Receiver], c.amount AS [Card Amount], " 
                 "c.id AS [Card TxiD]"
                 "from decks d inner join cards c on c.decks_id = d.txid "
-                "order by blockheight ASC, blockseq ASC, cardseq ASC")
+                "order by blocknum ASC, blockseq ASC, cardseq ASC")
     cards = []
     result = conn.execute(condition).fetchall()
     for a in result:
@@ -47,7 +47,7 @@ def productionCards(deck_id):
     condition = ("select d.name AS [Deck Name], c.blocknum AS [Card Blockheight], c.blockseq AS [Card Blocksequence]," + 
                 "c.cardseq AS [Card Sequence], c.sender AS [Sender], c.Receiver AS [Receiver], c.amount AS [Card Amount]," + 
                 "c.id AS [Card TxiD] from decks d inner join cards c on c.decks_id = d.txid where c.decks_id = '{}' ".format(deck_id) + 
-                "order by blockheight ASC, blockseq ASC, cardseq ASC")
+                "order by blocknum ASC, blockseq ASC, cardseq ASC")
     cards = []
     result = conn.execute(condition).fetchall()
     for a in result:

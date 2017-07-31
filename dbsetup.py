@@ -9,39 +9,26 @@ Base = declarative_base()
 
 ########################################################################
 
-class Blocks(Base):
-    """"""
-    __tablename__ = "blocks"
-    id = Column(Integer, unique=True)
-    blockhash = Column(String, primary_key=True)
-    blockheight = Column(Integer)
-
-    #----------------------------------------------------------------------
-    def __init__(self, blockhash, blockheight):
-        """"""
-        self.blockhash = blockhash
-        self.blockheight = blockheight
-
 class Decks(Base):
     """"""
     __tablename__ = "decks"
     txid = Column(String, primary_key=True)
     name = Column(String)
     issuer = Column(String)
-    proto = Column(String)
+    issue_mode = Column(String)
+    decimals = Column(Integer)
 
-    #Relationships
-    blocks_hash = Column(String, ForeignKey('blocks.blockhash'))
-    assets = relationship("Blocks", backref="decks")
+    blocks_hash = Column(String)
     
     #----------------------------------------------------------------------
-    def __init__(self, txid, name, issuer, blockhash, proto):
+    def __init__(self, txid, name, issuer, blockhash, issue_mode, decimals):
         """"""
         self.txid = txid
         self.name = name
         self.issuer = issuer
         self.blocks_hash = blockhash
-        self.proto = proto
+        self.issue_mode = issue_mode
+        self.decimals = decimals
 
 class Cards(Base):
     """"""
@@ -52,17 +39,15 @@ class Cards(Base):
     receiver = Column(String)
     sender = Column(String)
     amount = Column(Integer)
-    blockhash = Column(String)
-    blockheight = Column(Integer)
+    blocknum = Column(Integer)
     blockseq = Column(String)
-    proto = Column(String)
 
     #relationships
     decks_id = Column(String, ForeignKey('decks.txid'))
     assets = relationship("Decks", backref="cards")
     
     #----------------------------------------------------------------------
-    def __init__(self, id, txid, cardseq, receiver, sender, amount, blockhash, blockheight, blockseq, proto, deck_id):
+    def __init__(self, id, txid, cardseq, receiver, sender, amount, blocknum, blockseq, deck_id):
         """"""
         self.id = id
         self.txid = txid
@@ -70,11 +55,9 @@ class Cards(Base):
         self.receiver = receiver
         self.sender = sender
         self.amount = amount
-        self.blockhash = blockhash
-        self.blockheight = blockheight
+        self.blocknum = blocknum
         self.blockseq = blockseq
-        self.proto = proto
         self.decks_id = deck_id
-
+        
 # create tables
 Base.metadata.create_all(engine)

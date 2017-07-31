@@ -25,13 +25,28 @@ def productionAssets():
 
 @app.route('/papi/assets/cards')
 # List all production cards
-def productionCards():
+def _productionCards():
     Session = sessionmaker(bind=engine)
     s = Session()
     condition = ("select d.name AS [Deck Name], c.blockheight AS [Card Blockheight], c.blockseq AS [Card Blocksequence], "
                 "c.cardseq AS [Card Sequence], c.sender AS [Sender], c.Receiver AS [Receiver], c.amount AS [Card Amount], " 
-                "c.id AS [Card TxiD], c.proto AS [Card Proto], c.blockhash AS [Card Blockhash] "
+                "c.id AS [Card TxiD]"
                 "from decks d inner join cards c on c.decks_id = d.txid "
+                "order by blockheight ASC, blockseq ASC, cardseq ASC")
+    cards = []
+    result = conn.execute(condition).fetchall()
+    for a in result:
+        cards.append( dict(a) )
+    return jsonify(cards)
+
+@app.route('/papi/cards/<string:deck_id>')
+# List all production cards
+def productionCards(deck_id):
+    Session = sessionmaker(bind=engine)
+    s = Session()
+    condition = ("select d.name AS [Deck Name], c.blockheight AS [Card Blockheight], c.blockseq AS [Card Blocksequence]," + 
+                "c.cardseq AS [Card Sequence], c.sender AS [Sender], c.Receiver AS [Receiver], c.amount AS [Card Amount]," + 
+                "c.id AS [Card TxiD] from decks d inner join cards c on c.decks_id = d.txid where c.decks_id = '{}' ".format(deck_id) + 
                 "order by blockheight ASC, blockseq ASC, cardseq ASC")
     cards = []
     result = conn.execute(condition).fetchall()
@@ -55,7 +70,7 @@ def nameAssets(name):
     #condition = "select * from decks where name = '{}' ".format(name)
     condition = ("select d.name AS [Deck Name], c.blockheight AS [Card Blockheight], c.blockseq AS [Card Blocksequence], "
                 "c.cardseq AS [Card Sequence], c.sender AS [Sender], c.Receiver AS [Receiver], c.amount AS [Card Amount], " 
-                "c.id AS [Card TxiD], c.proto AS [Card Proto], c.blockhash AS [Card Blockhash] "
+                "c.id AS [Card TxiD], c.blockhash AS [Card Blockhash] "
                 "from decks d inner join cards c on c.decks_id = d.txid WHERE d.name = '{}' "
                 "order by blockheight ASC, blockseq ASC, cardseq ASC").format(name)
     decks = []
@@ -66,4 +81,4 @@ def nameAssets(name):
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5555)
+    app.run(host="0.0.0.0", port=5555)

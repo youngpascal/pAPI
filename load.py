@@ -1,13 +1,13 @@
 import pypeerassets as pa
 from binascii import hexlify, unhexlify
 from flask import session
-from dbsetup import *
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
+from dbsetup import *
 
-engine = create_engine('sqlite:///test.db', echo=False)
+engine = create_engine('sqlite:///data/papi.db')
 node = pa.RpcNode(testnet=True)
-
 
 def loadData():
 
@@ -42,7 +42,7 @@ def loadData():
             # Find Issuer
             issuer = pa.find_tx_sender(node, raw_tx)
             # Load database object from dbsetup
-            D = Decks( txid, d["name"], issuer, raw_tx["blockhash"], d["issue_mode"][0], d["number_of_decimals"] )
+            D = Decks( txid, d["name"], issuer, raw_tx["blockhash"], d["issue_mode"][0], d["number_of_decimals"], True )
             # Load values then pass into Protobuf Deck Object
             d["production"] = True
             d["issuer"] = issuer
@@ -53,14 +53,15 @@ def loadData():
             print("Deck: " + Deck.name + " sucessfully loaded")        
 
         except Exception as e:
-            print(e)
+            #print(e)
             continue
 
         try:
             # Load Deck P2TH WIF into daemon "accounts" using deck txid as label. 
             pa.load_deck_p2th_into_local_node(node, Deck)
         except Exception as e:
-            print(e)
+            #print(e)
+            pass
         
         loadCards(s, Deck)
         print("--Cards:" + Deck.name + " cards sucessfully loaded.")
@@ -95,16 +96,19 @@ def loadCards(s, Deck):
             continue
         try:
             for pc in pcard:
-                id = c["txid"] + str(pc["cardseq"])
-                C = Cards(id, pc["txid"], pc["cardseq"], pc["receiver"][0], sender, pc["amount"][0], blocknum, blockseq, Deck.asset_id )
                 try:
-                    CardObject = pa.protocol.CardTransfer(Deck, pc["receiver"], pc["amount"],txid =pc["txid"], blocknum=blocknum, cardseq=pc["cardseq"], blockseq=blockseq)
-                    _cards.append(CardObject)
-                except Exception as e:
-                    print(e)
-                s.add(C)
+                    C = pa.protocol.CardTransfer(Deck, pc["receiver"], pc["amount"],sender=pc["sender"], txid =pc["txid"], blocknum=blocknum, cardseq=pc["cardseq"], blockseq=blockseq)
+                    if C.sender == Deck.issuer:
+                        C.type = "CardIssue"
+                except:
+                    continue
+                id = c["txid"] + str(pc["cardseq"])
+                Card = Cards(id, pc["txid"], pc["cardseq"], pc["receiver"][0], sender, pc["amount"][0], C.type , blocknum, blockseq, Deck.asset_id )
+                _cards.append(C)
+                s.add(Card)
                 s.commit()
-        except Exception as e:
+                
+        except:
             s.rollback()
-
+            continue
 loadData()

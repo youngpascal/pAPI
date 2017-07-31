@@ -4,7 +4,7 @@ from sqlalchemy import Column, Date, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
-engine = create_engine('sqlite:///test.db', echo=True)
+engine = create_engine('sqlite:///data/papi.db', echo=True)
 Base = declarative_base()
 
 ########################################################################
@@ -17,11 +17,11 @@ class Decks(Base):
     issuer = Column(String)
     issue_mode = Column(String)
     decimals = Column(Integer)
-
     blocks_hash = Column(String)
+    subscribed = Column(Boolean)
     
     #----------------------------------------------------------------------
-    def __init__(self, txid, name, issuer, blockhash, issue_mode, decimals):
+    def __init__(self, txid, name, issuer, blockhash, issue_mode, decimals, subscribed):
         """"""
         self.txid = txid
         self.name = name
@@ -29,6 +29,7 @@ class Decks(Base):
         self.blocks_hash = blockhash
         self.issue_mode = issue_mode
         self.decimals = decimals
+        self.subscribed = subscribed
 
 class Cards(Base):
     """"""
@@ -39,15 +40,16 @@ class Cards(Base):
     receiver = Column(String)
     sender = Column(String)
     amount = Column(Integer)
+    ctype = Column(String)
     blocknum = Column(Integer)
-    blockseq = Column(String)
+    blockseq = Column(Integer)
 
     #relationships
     decks_id = Column(String, ForeignKey('decks.txid'))
     assets = relationship("Decks", backref="cards")
     
     #----------------------------------------------------------------------
-    def __init__(self, id, txid, cardseq, receiver, sender, amount, blocknum, blockseq, deck_id):
+    def __init__(self, id, txid, cardseq, receiver, sender, amount, ctype, blocknum, blockseq, deck_id):
         """"""
         self.id = id
         self.txid = txid
@@ -55,6 +57,7 @@ class Cards(Base):
         self.receiver = receiver
         self.sender = sender
         self.amount = amount
+        self.ctype = ctype
         self.blocknum = blocknum
         self.blockseq = blockseq
         self.decks_id = deck_id

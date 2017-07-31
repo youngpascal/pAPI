@@ -1,12 +1,17 @@
 from flask import jsonify, Flask, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
 # Setup database engine and connect
 engine = create_engine('sqlite:///data/papi.db')
 conn = engine.connect()
 # Setup Flask application
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+# Setup Session
+Session = sessionmaker(bind=engine)
+s = Session()
+
 
 @app.route('/papi')
 # Show PeerAssets version information
@@ -26,8 +31,6 @@ def productionAssets():
 @app.route('/papi/assets/cards')
 # List all production cards
 def _productionCards():
-    Session = sessionmaker(bind=engine)
-    s = Session()
     condition = ("select d.name AS [Deck Name],d.txid as [Deck ID], c.blocknum AS [Card Blockheight], c.blockseq AS [Card Blocksequence], "
                 "c.cardseq AS [Card Sequence], c.sender AS [Sender], c.Receiver AS [Receiver], c.amount AS [Card Amount], " 
                 "c.id AS [Card TxiD], c.ctype AS [Card Type]"
@@ -42,8 +45,6 @@ def _productionCards():
 @app.route('/papi/cards/<string:deck_id>')
 # List all production cards
 def productionCards(deck_id):
-    Session = sessionmaker(bind=engine)
-    s = Session()
     condition = ("select d.name AS [Deck Name],d.txid as [Deck ID], c.blocknum AS [Card Blockheight], c.blockseq AS [Card Blocksequence]," + 
                 "c.cardseq AS [Card Sequence], c.sender AS [Sender], c.Receiver AS [Receiver], c.amount AS [Card Amount]," + 
                 "c.id AS [Card TxiD], c.ctype AS [Card Type] from decks d inner join cards c on c.decks_id = d.txid where c.decks_id = '{}' ".format(deck_id) + 
@@ -79,6 +80,5 @@ def nameAssets(name):
         decks.append( dict(a) )
     return jsonify(decks)
 
-
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000)
+    app.run( host="0.0.0.0", port=5000)

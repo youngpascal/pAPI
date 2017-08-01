@@ -1,4 +1,5 @@
 from flask import jsonify, Flask, request
+from flask_cors import CORS
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -10,14 +11,15 @@ app = Flask(__name__)
 # Setup Session
 Session = sessionmaker(bind=engine)
 s = Session()
+# Setup CORS extension to allow the content-type header
+CORS(app, resources = r'/api/*')
 
-
-@app.route('/papi')
+@app.route('/api/')
 # Show PeerAssets version information
 def versionInfo():
     return jsonify({'name': "PeerAssets", "Version": 1.0})
 
-@app.route('/papi/assets')
+@app.route('/api/v1/assets')
 # List all production decks
 def productionAssets():
     condition = "select * from decks"
@@ -27,7 +29,7 @@ def productionAssets():
         decks.append( dict(a) )
     return jsonify(decks)
 
-@app.route('/papi/assets/cards')
+@app.route('/api/v1/assets/cards')
 # List all production cards
 def _productionCards():
     condition = ("select d.name AS [Deck Name],d.txid as [Deck ID], c.blocknum AS [Card Blockheight], c.blockseq AS [Card Blocksequence], "
@@ -41,7 +43,7 @@ def _productionCards():
         cards.append( dict(a) )
     return jsonify(cards)
 
-@app.route('/papi/cards/<string:deck_id>')
+@app.route('/api/v1/cards/<string:deck_id>', methods=['GET'])
 # List all production cards
 def productionCards(deck_id):
     condition = ("select blocknum, blockseq, cardseq, sender, " +
@@ -60,7 +62,7 @@ def productionCards(deck_id):
     res["cards"] = cards
     return jsonify(res)
 
-@app.route('/papi/assets/issuer/<string:issuer>', methods=['GET'])
+@app.route('/api/v1/assets/issuer/<string:issuer>', methods=['GET'])
 # List all assets by issuer
 def issuerAssets(issuer):
     condition = "select * from decks where issuer = '{}' ".format(issuer)
@@ -70,7 +72,7 @@ def issuerAssets(issuer):
         decks.append( dict(a) )
     return jsonify(decks)
 
-@app.route('/papi/assets/name/<string:name>', methods=['GET'])
+@app.route('/api/v1/assets/name/<string:name>', methods=['GET'])
 # List decks with specific name
 def nameAssets(name):
     #condition = "select * from decks where name = '{}' ".format(name)

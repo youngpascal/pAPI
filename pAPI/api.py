@@ -19,7 +19,7 @@ CORS(app, resources = r'/api/*')
 def versionInfo():
     return jsonify({'name': "PeerAssets", "Version": 1.0})
 
-@app.route('/api/v1/assets')
+@app.route('/api/v1/decks')
 # List all production decks
 def productionAssets():
     condition = "select * from decks"
@@ -29,7 +29,7 @@ def productionAssets():
         decks.append( dict(a) )
     return jsonify(decks)
 
-@app.route('/api/v1/assets/cards')
+@app.route('/api/v1/decks/cards')
 # List all production cards
 def _productionCards():
     condition = ("select d.name AS [Deck Name],d.txid as [Deck ID], c.blocknum AS [Card Blockheight], c.blockseq AS [Card Blocksequence], "
@@ -62,7 +62,7 @@ def productionCards(deck_id):
     res["cards"] = cards
     return jsonify(res)
 
-@app.route('/api/v1/assets/issuer/<string:issuer>', methods=['GET'])
+@app.route('/api/v1/decks/issuer/<string:issuer>', methods=['GET'])
 # List all assets by issuer
 def issuerAssets(issuer):
     condition = "select * from decks where issuer = '{}' ".format(issuer)
@@ -72,7 +72,7 @@ def issuerAssets(issuer):
         decks.append( dict(a) )
     return jsonify(decks)
 
-@app.route('/api/v1/assets/name/<string:name>', methods=['GET'])
+@app.route('/api/v1/decks/name/<string:name>', methods=['GET'])
 # List decks with specific name
 def nameAssets(name):
     #condition = "select * from decks where name = '{}' ".format(name)

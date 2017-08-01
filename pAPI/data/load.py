@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from dbsetup import *
 from config import asset_ids
 
-engine = create_engine('sqlite:///data/papi.db')
+engine = create_engine('sqlite:///papi.db')
 node = pa.RpcNode(testnet=True)
 
 # Bind session to engine

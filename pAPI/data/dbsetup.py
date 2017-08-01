@@ -4,7 +4,7 @@ from sqlalchemy import Column, Date, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
-engine = create_engine('sqlite:///data/papi.db', echo=True)
+engine = create_engine('sqlite:///papi.db', echo=True)
 Base = declarative_base()
 
 ########################################################################
@@ -45,7 +45,7 @@ class Cards(Base):
     blockseq = Column(Integer)
 
     #relationships
-    decks_id = Column(String, ForeignKey('decks.txid'))
+    decks_id = Column(String, ForeignKey('decks.id'))
     assets = relationship("Decks", backref="cards")
     
     #----------------------------------------------------------------------

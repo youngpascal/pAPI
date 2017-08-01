@@ -7,7 +7,7 @@ engine = create_engine('sqlite:///data/papi.db')
 conn = engine.connect()
 # Setup Flask application
 app = Flask(__name__)
-app.config['JSON_SORT_KEYS'] = False
+app.config['JSON_SORT_KEYS'] = 'ASC'
 # Setup Session
 Session = sessionmaker(bind=engine)
 s = Session()
@@ -45,15 +45,21 @@ def _productionCards():
 @app.route('/papi/cards/<string:deck_id>')
 # List all production cards
 def productionCards(deck_id):
-    condition = ("select d.name AS [Deck Name],d.txid as [Deck ID], c.blocknum AS [Card Blockheight], c.blockseq AS [Card Blocksequence]," + 
-                "c.cardseq AS [Card Sequence], c.sender AS [Sender], c.Receiver AS [Receiver], c.amount AS [Card Amount]," + 
-                "c.id AS [Card TxiD], c.ctype AS [Card Type] from decks d inner join cards c on c.decks_id = d.txid where c.decks_id = '{}' ".format(deck_id) + 
+    condition = ("select blocknum, blockseq, cardseq, sender, " +
+                "receiver, amount, id, ctype from cards " +
+                "where decks_id = '{}' ".format(deck_id) + 
                 "order by blocknum ASC, blockseq ASC, cardseq ASC")
     cards = []
-    result = conn.execute(condition).fetchall()
-    for a in result:
+    res = conn.execute(condition).fetchall()
+    for a in res:
         cards.append( dict(a) )
-    return jsonify(cards)
+
+    condition = ("select name, issuer, txid, issue_mode," +
+                "decimals from decks where txid = '{}' ".format(deck_id))
+
+    res = dict(conn.execute(condition).fetchone())
+    res["cards"] = cards
+    return jsonify(res)
 
 @app.route('/papi/assets/issuer/<string:issuer>', methods=['GET'])
 # List all assets by issuer

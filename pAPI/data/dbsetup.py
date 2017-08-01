@@ -12,7 +12,7 @@ Base = declarative_base()
 class Decks(Base):
     """"""
     __tablename__ = "decks"
-    txid = Column(String, primary_key=True)
+    id = Column(String, primary_key=True)
     name = Column(String)
     issuer = Column(String)
     issue_mode = Column(String)
@@ -21,9 +21,9 @@ class Decks(Base):
     subscribed = Column(Boolean)
     
     #----------------------------------------------------------------------
-    def __init__(self, txid, name, issuer, blockhash, issue_mode, decimals, subscribed):
+    def __init__(self, id, name, issuer, blockhash, issue_mode, decimals, subscribed):
         """"""
-        self.txid = txid
+        self.id = id
         self.name = name
         self.issuer = issuer
         self.blocks_hash = blockhash

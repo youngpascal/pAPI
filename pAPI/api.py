@@ -7,7 +7,6 @@ engine = create_engine('sqlite:///data/papi.db')
 conn = engine.connect()
 # Setup Flask application
 app = Flask(__name__)
-app.config['JSON_SORT_KEYS'] = 'ASC'
 # Setup Session
 Session = sessionmaker(bind=engine)
 s = Session()

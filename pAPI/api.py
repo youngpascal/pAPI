@@ -2,6 +2,7 @@ from flask import jsonify, Flask, request
 from flask_cors import CORS
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from load import *
 
 # Setup database engine and connect
 engine = create_engine('sqlite:///data/papi.db')
@@ -32,7 +33,7 @@ def productionAssets():
 @app.route('/api/v1/decks/cards')
 # List all production cards
 def _productionCards():
-    condition = ("select d.name AS [Deck Name],d.txid as [Deck ID], c.blocknum AS [Card Blockheight], c.blockseq AS [Card Blocksequence], "
+    condition = ("select d.name AS [Deck Name],d.id as [Deck ID], c.blocknum AS [Card Blockheight], c.blockseq AS [Card Blocksequence], "
                 "c.cardseq AS [Card Sequence], c.sender AS [Sender], c.Receiver AS [Receiver], c.amount AS [Card Amount], " 
                 "c.id AS [Card TxiD], c.ctype AS [Card Type]"
                 "from decks d inner join cards c on c.decks_id = d.txid "

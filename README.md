@@ -19,3 +19,11 @@ so while testing please load the database with data by running "load.py" in the 
 > python api.py
 
 Defaults to run on port 5000
+
+### Examples
+#### Lists all production decks
+> 127.0.0.1:5000/api/v1/decks
+#### Lists all decks issued by issuer
+> 127.0.0.1:5000/api/v1/decks/<**issuer**>
+#### Lists all cards for a given deck
+> 127.0.0.1:5000/api/v1/cards/<**deck_id**>

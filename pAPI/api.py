@@ -3,9 +3,10 @@ from flask_cors import CORS
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from load import *
+from __main__ import getConnectionString
 
 # Setup database engine and connect
-engine = create_engine('sqlite:///data/papi.db')
+engine = create_engine(getConnectionString())
 conn = engine.connect()
 # Setup Flask application
 app = Flask(__name__)
